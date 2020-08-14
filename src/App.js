@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {TodoBanner} from './TodoBanner';
+import { TodoBanner } from './TodoBanner';
 import { TodoCreator } from "./TodoCreator";
 import { TodoRow } from "./TodoRow";
 
@@ -14,7 +14,6 @@ export default class App extends Component {
         { action: "Коллекция билетов", done: true },
         { action: "Позвонить Виктору", done: false }
       ],
-      // newItemText: ""
     }
   }
 
@@ -22,9 +21,11 @@ export default class App extends Component {
     this.setState({ newItemText: event.target.value })
   }
 
-  createNewTodo = () => {
-    if (!this.state.todoItems.find(item => item.action === this.state.newItemText)) {
-      this.setState({ todoItems: [...this.state.todoItems, { action: this.state.newItemText, done: false }], newItemText: '' })
+  createNewTodo = (task) => {
+    if (!this.state.todoItems.find(item => item.action === task)) {
+      this.setState({
+        todoItems: [...this.state.todoItems, { action: task, done: false }]
+      })
     }
   }
 
@@ -33,16 +34,13 @@ export default class App extends Component {
   });
 
   todoTableRows = () => this.state.todoItems.map(item =>
-    <tr key={item.action}>
-      <td>{item.action}</td>
-      <td> <input type='checkbox' checked={item.done} onChange={() => this.toggleTodo(item)} /></td>
-    </tr>
+    <TodoRow key={item.action} item={item} callback={this.toggleTodo} />
   )
   chagedItemTodo = () => {
     const itemTodo = this.state.todoItems.filter(todo => !todo.done).length
     const textSet = 'У вас'
     if (itemTodo === 0) {
-      return 'У вас нет не оконченых дел'
+      return 'У вас нет неоконченых дел'
     } else if (itemTodo === 1) {
       return textSet + ' ' + itemTodo + ' неоконченное дело'
     } else if (itemTodo >= 2 && itemTodo <= 4) {
@@ -54,17 +52,9 @@ export default class App extends Component {
   render() {
     return (
       <div>
-        <h4 className="bg-info text-white text-center p-2">
-          Привет {this.state.userName}! <span>({this.chagedItemTodo()})</span>
-        </h4>
+        <TodoBanner name={this.state.userName} tasks={this.chagedItemTodo} />
         <div className="container-fluid">
-          <div className="my-1">
-            <input className="form-control"
-              value={this.state.newItemText}
-              onChange={this.updateNewTextValue} />
-            <button className="btn btn-primary mt-1"
-              onClick={this.createNewTodo}>Добавить задание</button>
-          </div>
+          <TodoCreator callback={this.createNewTodo} />
           <table className="table table-striped table-bordered">
             <thead>
               <tr><th>Описание</th><th>Выбрано/Не выбрано</th></tr>
